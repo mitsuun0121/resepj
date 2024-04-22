@@ -25,34 +25,51 @@
         class="mx-auto"
         max-width="500"
         :height="isMobile ? '648' : ''"
-        flat
-        >
+        flat>
+        
+        <!-- 店舗画像 -->
         <v-img
           :src="shop.photo_url"
           max-height="350">
         </v-img>
 
-        <!-- 店名 レビュー -->
+        <!-- 店名 -->
         <div
           class="d-flex
           justify-space-between">
           <v-card-title
-            style="font-size: clamp(1.35rem, calc(0.8vw + 0.9rem), 2rem);"
+            style="font-size: clamp(1.2rem, calc(0.8vw + 0.9rem), 2rem);"
             class="font-weight-bold">{{ shop.name }}
           </v-card-title>
+
+          <v-spacer></v-spacer>
+
+          <!-- レビュー -->
           <v-rating
             v-model="rating"
             class="mt-5 mr-1"
             length="5"
-            :size="20"
+            :size="21"
             color="info"
             background-color="grey"
             half-increments
             readonly>
           </v-rating>
         </div>
+        <!-- 口コミ件数・評価値 -->
+        <v-row justify="end">
+          <span
+            class="grey--text
+            text--darken-1
+            text-body-2
+            mb-8
+            mr-5">
+            {{ totalReview }}件
+            ({{ rating }})
+          </span>
+        </v-row>
 
-        <!-- #エリア#ジャンル お気に入り -->
+        <!-- #エリア#ジャンル -->
         <div
           class="d-flex">
           <v-card-text
@@ -61,7 +78,7 @@
             #{{ area.name }} #{{ genre.name }}
           </v-card-text>
         
-          <!-- ログインユーザー -->
+          <!-- お気に入り ログインユーザー -->
           <template v-if="$auth.loggedIn">
             <v-tooltip
               left
@@ -87,7 +104,7 @@
             </v-tooltip>
           </template>
 
-          <!-- 未ログインユーザー -->
+          <!-- お気に入り 未ログインユーザー -->
           <template v-else>
             <NuxtLink to="/users/login">
               <v-tooltip left color="success">
@@ -117,7 +134,7 @@
 
         <v-divider class="mx-4 mb-1"></v-divider>
 
-        <!-- お店の説明文 -->
+        <!-- 店舗概要 -->
         <v-card-text
           class="font-weight-bold
           mb-n15"
@@ -139,7 +156,8 @@ export default {
       shop: null,
       area: "",
       genre: "",
-      rating: null,
+      rating: 0,
+      totalReview: 0,
       isMobile: false, // ブラウザ幅が768px以上かどうか
       favorite: [],
       shopId: [],
@@ -268,11 +286,11 @@ export default {
           return;
         }
         // 評価の平均値を計算
-        const totalReview = response.data.length;
-        console.log('評価の数', totalReview);
+        this.totalReview = response.data.length;
+        console.log('評価の数', this.totalReview);
         const totalRating = response.data.reduce((acc, curr) => acc + curr.review, 0);
         console.log('評価の合計', totalRating);
-        this.rating = totalRating / totalReview;
+        this.rating = totalRating / this.totalReview;
         console.log('平均評価', this.rating);
 
       } catch (error) {
