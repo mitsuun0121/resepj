@@ -10,7 +10,7 @@
 
           <v-btn value="shop">
             <span class="mt-1">店舗</span>
-            <v-icon>mdi-home-plus</v-icon>
+            <v-icon>mdi-home-edit</v-icon>
           </v-btn>
 
           <v-btn value="reservation">

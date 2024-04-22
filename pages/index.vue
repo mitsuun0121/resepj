@@ -3,12 +3,18 @@
     <v-row justify="center" align="center">
       <v-col cols="12" sm="8" md="6">
         <h1 
-          style="font-size: clamp(1rem, calc(0.7vw + 0.8rem), 2.8rem); margin-bottom: 5px;">{{ displayTitle }}
+          style="font-size: clamp(1rem, calc(0.7vw + 0.8rem), 2.8rem);
+          margin-bottom: 5px;">
+          {{ displayTitle }}
         </h1>
 
         <v-divider></v-divider>
-        <div v-if="shopsCounted" class="mt-4">
-          <p>該当一覧 : <span style="color: red;">{{ shopCount }}</span> 件</p>
+        <div
+          v-if="shopsCounted"
+          class="mt-4">
+          <p>該当一覧 : <span style="color: red;">
+            {{ shopCount }}</span> 件
+          </p>
         </div>
         <v-divider></v-divider>
 
@@ -73,6 +79,26 @@
               <v-icon>mdi-magnify</v-icon>
             </v-btn>
           </v-sheet>
+        </v-card>
+
+        <v-card class="py-4 d-flex" elevation="0">
+          <!-- お店の並べ替え -->
+          <v-menu open-on-hover offset-y>
+            <template v-slot:activator="{ on }">
+                <v-btn
+                class="mr-4"
+                text v-on="on"
+                outlined>
+                {{ selectedSortText }}
+                <v-icon>mdi-menu-down</v-icon>
+              </v-btn>
+            </template>
+            <v-list class="py-1 text-caption">
+              <v-list-item @click="sortByRandom">ランダム</v-list-item>
+              <v-list-item @click="sortByHighRating">評価が高い順</v-list-item>
+              <v-list-item @click="sortByLowRating">評価が低い順</v-list-item>
+            </v-list>
+          </v-menu>
         </v-card>
       </v-col>
     </v-row>
@@ -156,7 +182,7 @@
             </template>
           </div>
           
-          <!-- レビュー -->
+          <!-- 評価 -->
           <v-rating
             v-model="shop.averageRating"
             class="mb-1 ml-3"
@@ -190,25 +216,26 @@
             <p 
               style="font-size: clamp(1rem, calc(0.7vw + 0.8rem), 2.8rem);
               font-weight: bold;
-              color: rgb(127, 127, 127);"
-              >※該当するお店が見つかりませんでした。
+              color: rgb(127, 127, 127);">
+              ※該当するお店が見つかりませんでした。
             </p>
             <v-btn
               @click="fetchShopData()"
               class="mt-8 px-4"
               color="primary"
               :rounded="true"
-              height="45" >トップページへ戻る
+              height="45" >
+              トップページへ戻る
             </v-btn>
           </v-card>
-      </v-col>
+        </v-col>
       </v-row>
     </v-row>
   </v-container>
 </template>
 
 <script>
-
+import _ from 'underscore';
 export default {
   name: 'IndexPage',
   data() {
@@ -222,7 +249,7 @@ export default {
       shopId: [],
       shops: false, // shops関連の初期表示
       shopsCounted: false, // ショップ件数の初期表示
-      
+      selectedSort: '並び替え',
     };
   },
 
@@ -234,6 +261,19 @@ export default {
     // 取得したショップデータの件数
     shopCount() {
       return this.shops.length;
+    },
+    // 選択されたテキストを表示
+    selectedSortText() {
+      switch (this.selectedSort) {
+        case 'ランダム':
+            return 'ランダム';
+        case '評価が高い順':
+            return '評価が高い順';
+        case '評価が低い順':
+            return '評価が低い順';
+        default:
+            return '並び替え';
+      }
     },
   },
   
@@ -306,7 +346,7 @@ export default {
         this.searchResult = '「' + genre + '」' + ' の検索結果一覧';
         this.shops = response.data;
 
-        // レビューデータを取得
+        // 評価データを取得
         await this.fetchReviewData();
         
       } catch (error) {
@@ -405,21 +445,21 @@ export default {
       }
     },
 
-    // レビューデータを取得
+    // 評価データを取得
     async fetchReviewData() {
       try {
         const response = await this.$axios.get(`${process.env.API_URL}/api/review`);
 
-        console.log('レビューデータ', response.data);
-        // レビューデータがない場合は何もしない
+        console.log('評価データ', response.data);
+        // 評価データがない場合は何もしない
         if (response.data.length === 0) {
-          console.log('レビューがありません');
+          console.log('評価がありません');
           return;
         }
         // 店舗ごとのレビューデータを格納するためのオブジェクト
         const shopReview = {};
         
-        // レビューデータを店舗ごとに分ける
+        // 評価データを店舗ごとに分ける
         for (const key in response.data) {
           if (response.data.hasOwnProperty(key)) {
             const review = response.data[key];
@@ -430,13 +470,13 @@ export default {
             shopReview[shopId].push(review);
           }
         }
-        // 各店舗ごとのレビューデータの処理
+        // 各店舗ごとの評価データの処理
         for (const shopId in shopReview) {
           if (shopReview.hasOwnProperty(shopId)) {
             const totalReview = shopReview[shopId];
-            console.log(`店舗ID ${shopId} のレビューデータ:`, totalReview);
+            console.log(`店舗ID ${shopId} の評価データ:`, totalReview);
             
-            // 各店舗のレビューの平均評価
+            // 各店舗の平均評価
             const totalRating = totalReview.reduce((acc, curr) => acc + curr.review, 0);
             const averageRating = totalRating / totalReview.length;
             console.log(`店舗ID ${shopId} の平均評価:`, averageRating);
@@ -451,8 +491,39 @@ export default {
           }
         }
       } catch (error) {
-        console.error('レビューデータの取得に失敗しました', error);
+        console.error('評価データの取得に失敗しました', error);
       }
+    },
+
+    // Underscore.jsを使用して並び替えを実装
+
+    // ランダムな並べ替え
+    sortByRandom() {
+      this.selectedSort = 'ランダム';
+      this.shops = _.shuffle(this.shops);
+      console.log("sortByRandom:", this.shops);
+    },
+
+    // 評価が高い順に並べ替え
+    sortByHighRating() {
+      this.selectedSort = '評価が高い順';
+      this.shops = _.sortBy(this.shops, (shop) => {
+        
+        return shop.averageRating ? -shop.averageRating : Number.POSITIVE_INFINITY;
+
+      });
+      console.log("sortByHighRating:", this.shops);
+    },
+
+    // 評価が低い順に並べ替え
+    sortByLowRating() {
+      this.selectedSort = '評価が低い順';
+      this.shops = _.sortBy(this.shops, (shop) => {
+        
+        return shop.averageRating || Number.POSITIVE_INFINITY;
+
+      });
+      console.log("sortByLowRating:", this.shops);
     },
   },
 }

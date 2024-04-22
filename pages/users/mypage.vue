@@ -24,7 +24,7 @@
           </v-btn>
 
           <v-btn value="review">
-            <span class="mt-1">レビュー</span>
+            <span class="mt-1">口コミ</span>
             <v-icon>mdi-tooltip-text-outline</v-icon>
           </v-btn>
 

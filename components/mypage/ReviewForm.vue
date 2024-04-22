@@ -1,8 +1,8 @@
 <template>
   <v-container>
-    <!-- レビュー作成と削除 -->
+    <!-- 口コミ作成と削除 -->
     <v-card-title>
-      <v-icon left>mdi-tooltip-text-outline</v-icon>レビュー
+      <v-icon left>mdi-tooltip-text-outline</v-icon>口コミ
     </v-card-title>
 
     <!-- Snackbar コンポーネントを表示 -->
@@ -23,14 +23,15 @@
       color="primary"
       align-tabs="center"
       >
-      <v-tab @click="tab = 1">レビュー投稿</v-tab>
+      <v-tab @click="tab = 1">口コミ投稿</v-tab>
       <v-tab @click="tab = 2">投稿履歴</v-tab>
     </v-tabs>
     <v-divider></v-divider>
 
-<!-- レビュー投稿 -->
+<!-- 口コミ投稿 -->
     <div v-if="tab === 1">
-      <v-card class="mt-3">
+      <v-card>
+        <v-card-text>
         <v-row justify="center">
           <v-col cols="12" sm="8" md="8" lg="8">
             <div align="center">
@@ -40,16 +41,23 @@
                 color="primary"
                 dense
                 text>
-                <div class="mt-1">※項目は全て必須</div>
+                <div class="mt-1">
+                  口コミ投稿フォーム
+                </div>
               </v-alert>
             </div>
 
-            <v-form ref="reviewserver">
-              <v-card-text>店名</v-card-text>
+            <v-form
+              ref="reviewserver"
+              enctype="multipart/form-data">
+              <v-card-text>
+                店名
+                <span class="red--text">（必須）</span>
+              </v-card-text>
               <v-select
                 v-model="shopName"
                 class="mt-n2"
-                :items="shopNames"
+                :items="filteredShopNames"
                 dense
                 outlined
                 hint="店名を選択して下さい。"
@@ -59,7 +67,11 @@
               ></v-select>
               <v-divider></v-divider>
 
-              <v-card-text class="mt-5">評価</v-card-text>
+              <v-card-text
+                class="mt-5">
+                評価
+                <span class="red--text">（必須）</span>
+              </v-card-text>
               <v-rating
                 v-model="rating"
                 class="mt-n4"
@@ -69,12 +81,15 @@
                 color="info"
                 background-color="grey lighten-2"
               ></v-rating>
-              <v-messages v-if="rating > 0"
+              <v-messages
+                v-if="rating > 0"
                 class="mb-2
                 ml-3"
                 :value="ratingMessage"
+                color="gray"
               ></v-messages>
-              <v-messages v-else
+              <v-messages
+                v-else
                 class="mb-2
                 ml-3"
                 :value="ratingMessage"
@@ -82,183 +97,93 @@
               ></v-messages>
               <v-divider></v-divider>
 
-              <v-card-text class="mt-5">タイトル</v-card-text>
+              <v-card-text
+                class="mt-5">
+                タイトル
+                <span class="red--text">（必須）</span>
+              </v-card-text>
               <v-text-field
                 v-model="title"
                 class="mt-n2"
                 outlined
                 dense
                 counter
-                hint="2文字以上25文字以内で入力して下さい。"
+                hint="2～25文字の範囲で入力して下さい。"
                 persistent-hint
                 :rules="titleRules"
                 required
               ></v-text-field>
               <v-divider></v-divider>
 
-              <v-card-text class="mt-5">本文</v-card-text>
+              <v-card-text
+                class="mt-5">
+                本文
+                <span class="red--text">（必須）</span>
+              </v-card-text>
               <v-textarea
                 v-model="comment"
                 class="mt-n2"
                 outlined
                 auto-grow
                 counter
-                hint="25文字以上500文字以内で入力して下さい。"
+                hint="25～400文字の範囲で入力して下さい。"
                 persistent-hint
                 :rules="commentRules"
                 required
               ></v-textarea>
               <v-divider></v-divider>
+            
+              <!-- 画像アップロード -->
+              <v-card-text class="mt-5">画像を追加</v-card-text>
+              <template>
+                <div>
+                  <!-- ファイル選択 -->
+                  <input
+                    type="file"
+                    ref="imageInput"
+                    @change="handleImageUpload"
+                    accept="image/png,image/jpeg">
+                
+                  <!-- アップロードされた画像のプレビュー -->
+                  <img
+                    v-if="imageUrl"
+                    :src="imageUrl"
+                    alt="Uploaded Image"
+                    width="200"
+                    class="mt-3"
+                    @dragover.prevent>
 
-              <v-card-text class="mt-5">性別</v-card-text>
-              <v-select
-                v-model="gender"
-                class="mt-n2"
-                :items="genders"
-                dense
-                outlined
-                hint="性別を選択して下さい。"
-                persistent-hint
-                :rules="genderRules"
-                required
-              ></v-select>
-              <v-divider></v-divider>
+                  <!-- 非対応拡張子のエラーメッセージ -->
+                  <p
+                  v-if="fileError"
+                  :style="{ color: fileErrorColor }">
+                  {{ fileError }}</p>
+                </div>
+              </template>
 
-              <v-card-text class="mt-5">年代</v-card-text>
-              <v-select
-                v-model="age"
-                class="mt-n2"
-                :items="ages"
-                dense
-                outlined
-                hint="年代を選択して下さい。"
-                persistent-hint
-                :rules="ageRules"
-                required
-              ></v-select>
-              <v-divider></v-divider>
+              <!--　口コミ投稿ボタン -->
+              <div
+                class="text-center
+                mt-12
+                pb-8">
+                <v-btn
+                  color="primary"
+                  min-width="150"
+                  height="50"
+                  rounded
+                  class="text-body-1"
+                  @click="addReview">
+                  口コミを投稿
+                </v-btn>
+              </div>
             </v-form>
-
-            <!--　投稿内容確認ボタン -->
-            <div
-              class="text-center
-              mt-12
-              pb-8">
-              <v-btn
-                color="primary"
-                min-width="200"
-                height="55"
-                rounded
-                class="text-body-1
-                font-weight-bold"
-                @click="openAddReviewDialog">
-                投稿内容を確認する
-              </v-btn>
-            </div>
           </v-col>
         </v-row>
+        </v-card-text>
       </v-card>
-
-      <!-- レビュー内容確認ボトムシート -->
-      <v-bottom-sheet
-        v-model="addReviewDialog" width="500">
-        <v-card>
-          <!-- レビュー内容を確認するリスト -->
-          <v-list>
-            <p class="text-center
-              pt-4">
-              レビュー内容
-            </p>
-            <v-list-item class="mb-1">
-              <v-list-item-title
-              class="text-subtitle-2 mr-n16">
-                店名
-              </v-list-item-title>
-              <v-list-item-title class="ml-n16">
-                {{ shopName }}
-              </v-list-item-title>
-            </v-list-item>
-
-            <v-list-item class="mb-1">
-              <v-list-item-title
-              class="text-subtitle-2 mr-n16">
-                評価
-              </v-list-item-title>
-              <v-list-item-title class="ml-n16">
-                {{ rating }}
-              </v-list-item-title>
-            </v-list-item>
-
-            <v-list-item class="mb-1">
-              <v-list-item-title class="text-subtitle-2 mr-n16">
-                タイトル
-              </v-list-item-title>
-              <v-list-item-title class="ml-n16">
-                {{ title }}
-              </v-list-item-title>
-            </v-list-item>
-
-            <v-list-item class="mb-1">
-              <v-list-item-title class="text-subtitle-2 mr-n16">
-                本文
-              </v-list-item-title>
-              <v-list-item-title class="ml-n16">
-                {{ comment }}
-              </v-list-item-title>
-            </v-list-item>
-
-            <v-list-item class="mb-1">
-              <v-list-item-title class="text-subtitle-2 mr-n16">
-                性別
-              </v-list-item-title>
-              <v-list-item-title class="ml-n16">
-                {{ gender }}
-              </v-list-item-title>
-            </v-list-item>
-
-            <v-list-item class="mb-1">
-              <v-list-item-title class="text-subtitle-2 mr-n16">
-                年代
-              </v-list-item-title>
-              <v-list-item-title class="ml-n16">
-                {{ age }}
-              </v-list-item-title>
-            </v-list-item>
-          </v-list>
-
-          <!-- レビュー投稿ボタン -->
-          <div
-            class="d-flex justify-center">
-            <v-btn
-              class="text-body-1
-              mt-2
-              mb-7
-              mr-1"
-              color="primary"
-              outlined
-              width="182"
-              height="50"
-              @click="closeDialog">
-              投稿画面に戻る
-            </v-btn>
-
-            <v-btn
-              class="text-body-1
-              mt-2
-              mb-7
-              ml-1"
-              color="primary"
-              width="182"
-              height="50"
-              @click="addReview">
-              投稿する
-            </v-btn>
-          </div>
-        </v-card>
-      </v-bottom-sheet>
     </div>
 
-<!-- レビュー履歴 -->
+<!-- 投稿履歴 -->
     <div v-if="tab === 2">
       <v-data-table
         fixed-header
@@ -269,7 +194,21 @@
         hide-default-footer
         mobile-breakpoint="768"
         >
-        <template v-slot:item.actions="{ item }">
+        <template v-slot:item.edit="{ item }">
+          <!-- 編集ボタン -->
+          <v-btn
+            fab
+            small
+            depressed
+            color="primary"
+            @click="openEditDialog(item)">
+            <v-icon>
+              mdi-pencil
+            </v-icon>
+          </v-btn>
+        </template>
+
+        <template v-slot:item.delete="{ item }">
           <!-- 削除ボタン -->
           <v-btn
             fab
@@ -296,27 +235,77 @@
         </template>
       </v-data-table>
 
-      <!-- レビュー履歴削除ダイアログ -->
+      <!-- 編集ダイアログ -->
+      <v-dialog v-model="editDialog" width="500">
+        <v-card class="pb-4">
+          <v-card-title class="text-h6">口コミを編集</v-card-title>
+          <v-card-text>
+
+            <v-card-text class="mb-n5">評価</v-card-text>
+            <v-rating
+              v-model="editedReview.review"
+              color="info"
+              background-color="grey lighten-2">
+            </v-rating>
+            <v-messages
+              class="mb-2
+              ml-3"
+              :value="ratingMessage"
+              color="gray"
+            ></v-messages>
+
+            <v-card-text class="mb-n2">タイトル</v-card-text>
+            <v-text-field 
+              v-model="editedReview.title"
+              outlined
+              dense
+              counter
+              :rules="titleRules"
+              required
+              hint="2～25文字の範囲で入力して下さい。"
+              persistent-hint>
+            </v-text-field>
+
+            <v-card-text class="mb-n2">本文</v-card-text>    
+            <v-textarea
+              v-model="editedReview.comment"
+              outlined
+              dense
+              counter
+              :rules="commentRules"
+              required
+              hint="25～400文字の範囲で入力して下さい。"
+              persistent-hint>
+            </v-textarea>
+
+          </v-card-text>
+          <v-card-actions>
+            <v-btn @click="closeDialog">キャンセル</v-btn>
+            <v-spacer></v-spacer>
+            <v-btn color="primary" @click="updateReview">投稿する</v-btn>
+          </v-card-actions>
+        </v-card>
+      </v-dialog>
+
+      <!-- 投稿履歴削除ダイアログ -->
       <v-dialog v-model="deleteDialog" width="350">
         <v-card>
           <v-card-title
             class="text-subtitle-1">削除確認
           </v-card-title>
           <v-card-text>
-            レビューを削除してもよろしいですか？
+            口コミを削除してもよろしいですか？
           </v-card-text>
           <v-card-actions>
             <v-btn
-              @click="closeDialog"
-              class="text-body-2
-              font-weight-bold">キャンセル
+              @click="closeDialog">
+              キャンセル
             </v-btn>
             <v-spacer></v-spacer>
             <v-btn
               @click="deleteReviewId"
               color="error"
-              class="text-body-2
-              font-weight-bold">
+              class="text-body-1">
               OK
             </v-btn>
           </v-card-actions>
@@ -327,39 +316,33 @@
 </template>
 
 <script>
+
 export default {
   name: 'ReviewForm',
   data() {
     return {
-      reviews: [], // レビュー情報
+      reviews: [], // 口コミ情報
       pastReservations: [], // 来店済のお店
       shopNames: [], // お店の名前のリスト
       shopName: null, // 選択されたお店の名前
       rating: 0,
       title: '',
       comment: '',
-      gender: null,
-      age: null,
-      tab: 1, // デフォルトはレビュー投稿
-      addReviewDialog: false,
-      deleteDialog: false,
-      ratingMessage: ['評価を選択してください。'],
+      image: '',
+      tab: 1, // デフォルトは口コミ投稿
+      editDialog: false,
+      editedReview: {
+        id: null,
+        review: '',
+        title: '',
+        comment: '',
+      },
+      imageUrl: '',
+      fileError: '', // 非対応の拡張子のエラーメッセージの変数
 
-      genders: [
-        '女性',
-        '男性',
-        '無回答',
-      ],
-      ages: [
-        '10代',
-        '20代',
-        '30代',
-        '40代',
-        '50代',
-        '60代',
-        '70代',
-        '80代',
-      ],
+      deleteDialog: false,
+
+      ratingMessage: ['評価を選択してください。'],
 
       // スナックバー
       snackbar: {
@@ -381,20 +364,15 @@ export default {
       commentRules: [
         v => !!v || '本文を入力して下さい。',
         v => (v && v.length >= 25) || '25文字以上で入力してください。',
-        v => (v && v.length <= 500) || '500文字以下で入力してください。',
-      ],
-      genderRules: [
-        v => !!v || '性別を選択して下さい。',
-      ],
-      ageRules: [
-        v => !!v || '年代を選択して下さい。',
+        v => (v && v.length <= 400) || '400文字以下で入力してください。',
       ],
 
       // 投稿履歴テーブルのヘッダー
       reviewHeaders: [
         { text: '店名', value: 'shopName', sortable: false },
         { text: '投稿日', value: 'created_at', sortable: false },
-        { text: '削除', value: 'actions', sortable: false, align: 'center' },
+        { text: '編集', value: 'edit', sortable: false, align: 'center' },
+        { text: '削除', value: 'delete', sortable: false, align: 'center' },
       ],
     }
   },
@@ -404,32 +382,28 @@ export default {
     this.fetchReview();
   },
 
+  computed: {
+    // 口コミが投稿されていない店名のリストのみ取得
+    filteredShopNames() {
+      return this.shopNames.filter(shopName => !this.reviews.some(review => review.shopName === shopName));
+    },
+  },
+
   methods: {
     // snackbar
     showSnackbar({ message, color }) {
       this.snackbar.message = message;
-      this.snackbar.color = color || 'primary'; // デフォルトの色
+      this.snackbar.color = color || 'primary';
       this.snackbar.show = true;
     },
 
-    // フォームのバリデーション
-    async validateForm() {
-      return this.$refs.reviewserver.validate();
-    },
-
-    // 投稿内容確認ダイアログを開く
-    openAddReviewDialog() {
-      this.validateForm().then(valid => {
-        if (valid) {
-          
-          if (!this.rating) {
-            // 強制的にバリデーションをトリガー
-            this.$refs.rating.$emit('change', true);
-            return;
-          }
-          this.addReviewDialog = true;
-        } 
-      });
+    openEditDialog(review) {
+      // 編集対象の口コミ情報をセット
+      this.editedReview.id = review.id;
+      this.editedReview.review = review.review;
+      this.editedReview.title = review.title;
+      this.editedReview.comment = review.comment;
+      this.editDialog = true;
     },
 
     // 投稿履歴削除ダイアログを開く
@@ -438,44 +412,10 @@ export default {
       this.deleteDialog = true;
     },
 
-    // 投稿内容確認・投稿履歴削除ダイアログを閉じる
+    // 投稿内容編集・投稿履歴削除ダイアログを閉じる
     closeDialog() {
-      this.addReviewDialog = false;
+      this.editDialog = false;
       this.deleteDialog = false;
-    },
-
-    // 性別を数値に変換
-    genderToNumber(gender) {
-      console.log('genderToNumber:', gender);
-      if (gender === '男性') {
-        return 1;
-      } else if (gender === '女性') {
-        return 2;
-      } else if (gender === '無回答') {
-        return 3;
-      } 
-    },
-
-    // 年代を数値に変換
-    ageToNumber(age) {
-      console.log('ageToNumber:', age);
-      if (age === ' 10代') {
-        return 1;
-      } else if (age === '20代') {
-        return 2;
-      } else if (age === '30代') {
-        return 3;
-      } else if (age === '40代') {
-        return 4;
-      } else if (age === '50代') {
-        return 5;
-      } else if (age === '60代') {
-        return 7;
-      } else if (age === '70代') {
-        return 7;
-      } else if (age === '80代') {
-        return 8;
-      } 
     },
 
     // フォームリセット
@@ -484,43 +424,84 @@ export default {
       this.rating = 0;
       this.title = '';
       this.comment = '';
-      this.gender = null;
-      this.age = null;
+      this.imageUrl = '';
       this.$refs.reviewserver.reset();
     },
 
-    // レビュー投稿
+    // ファイルから選択して画像をアップロード
+    handleImageUpload(event) {
+      const file = event.target.files[0];
+      if (!file) return;
+
+      // 画像URLから拡張子を取得
+      const extension = file.name.split('.').pop().toLowerCase();
+
+      // jpeg, png以外の拡張子の場合はエラーメッセージ
+      if (extension !== 'jpg' && extension !== 'jpeg' && extension !== 'png') {
+        this.fileError = '写真はJPEGまたはPNG形式を選択してください。';
+        this.fileErrorColor = 'red';
+        return;
+      }
+      this.fileError = '';
+      this.imageUrl = URL.createObjectURL(file);
+    },
+
+    // フォームのバリデーション
+    async validateForm() {
+      return this.$refs.reviewserver.validate();
+    },
+
+    addReview() {
+      this.validateForm().then(valid => {
+        if (valid) {
+          if (!this.rating) {
+            // 強制的にバリデーションをトリガー
+            this.$refs.rating.$emit('change', true);
+            return;
+          }
+        } 
+      });
+    },
+
+    // 口コミを投稿
     async addReview() {
       try {
-        // 選択されたお店のIDを取得
-        const selectedShop = this.shopNames.indexOf(this.shopName);
-        const shopId = this.shopIds[selectedShop];
-        // 性別を整数に変換
-        const convertGender = this.genderToNumber(this.gender);
-        // 年代を整数に変換
-        const convertage = this.ageToNumber(this.age);
+        const valid = await this.validateForm();
 
-        const response = await this.$axios.post(`${process.env.API_URL}/api/review`, {
-          shop_id: shopId,
-          review: this.rating,
-          title: this.title,
-          comment: this.comment,
-          gender: convertGender,
-          age: convertage,
-        });
+        if (valid) {
+          // 選択されたお店のIDを取得
+          const selectedShop = this.shopNames.indexOf(this.shopName);
+          const shopId = this.shopIds[selectedShop];
+          const userId = this.$auth.user.id;
 
-        this.fetchReview();
-        this.closeDialog();
-        this.resetForm();
+          // FormDataオブジェクトを作成
+          const formData = new FormData();
+          formData.append('user_id', userId);
+          formData.append('shop_id', shopId);
+          formData.append('review', this.rating);
+          formData.append('title', this.title);
+          formData.append('comment', this.comment);
 
-        console.log('レビューを投稿しました', response.data);
+          // ファイルを追加
+          const file = this.$refs.imageInput.files[0];
+          formData.append('image', file);
 
+          // フォームデータを送信
+          const response = await this.$axios.post(`${process.env.API_URL}/api/review`, formData);
+
+          this.fetchReview();
+          this.resetForm();
+
+          console.log('口コミを投稿しました', response.data);
+
+          this.showSnackbar({ message: '口コミを投稿しました', color: 'primary' });
+        }
       } catch (error) {
-        console.error('レビューの投稿に失敗しました', error);
+        console.error('口コミの投稿に失敗しました', error);
       }
     },
 
-    // レビュー履歴を取得
+    // 投稿履歴を取得
     async fetchReview() {
       try {
         const response = await this.$axios.get(`${process.env.API_URL}/api/review`);
@@ -530,22 +511,44 @@ export default {
           const loginUser = this.$auth.user.id;
           
           this.reviews = response.data;
-          console.log('レビューデータ:', this.reviews);
-          // ログインユーザーのレビューデータのみを抽出
+          console.log('口コミデータ:', this.reviews);
+          
+          // ログインユーザーの口コミデータのみを抽出
           const userReviews = this.reviews.filter(review => review.user_id === loginUser);
           console.log('ユーザーID:', loginUser);
-          console.log('抽出されたレビューデータ:', userReviews);
+          console.log('抽出された口コミデータ:', userReviews);
           
           // 店名・投稿日をフォーマット
           userReviews.forEach(userReview => {
             userReview.created_at = this.formatDate(userReview.created_at);
             userReview.shopName = userReview.shop.name;
           });
-          // ログインユーザーのレビューデータのみを表示
+
+          // ログインユーザーの口コミデータのみを表示
           this.reviews = userReviews;
         }
       } catch (error) {
-        console.error('レビュー履歴の取得に失敗しました', error)
+        console.error('投稿履歴の取得に失敗しました', error)
+      }
+    },
+
+    // 口コミを編集
+    async updateReview() {
+      try {
+        const response = await this.$axios.put(`${process.env.API_URL}/api/review/${this.editedReview.id}`, {
+          review: this.editedReview.review,
+          title: this.editedReview.title,
+          comment: this.editedReview.comment,
+        });
+        
+        this.closeDialog();
+        this.fetchReview();
+
+        console.log('口コミを更新しました', response.data);
+
+        this.showSnackbar({ message: '口コミを更新しました', color: 'primary' });
+      } catch (error) {
+        console.error('口コミの更新に失敗しました', error);
       }
     },
 
@@ -555,19 +558,20 @@ export default {
       this.deleteDialog = false;
     },
 
-    // レビューを削除する
+    // 口コミを削除
     async deleteReview(id) {
       try {
         const response = await this.$axios.delete(`${process.env.API_URL}/api/review/${id}`);
 
-        console.log('レビュー履歴が削除されました', response.data);
+        console.log('口コミが削除されました', response.data);
 
-        this.showSnackbar({ message: 'レビュー履歴が削除されました', color: 'error' });
+        this.showSnackbar({ message: '口コミが削除されました', color: 'error' });
 
-        this.fetchReview();
+        // 画面を更新
+        this.reviews = this.reviews.filter(review => review.id !== id);
 
       } catch (error) {
-        console.error('レビュー履歴の削除に失敗しました', error);        
+        console.error('口コミの削除に失敗しました', error);        
       }
     },
 

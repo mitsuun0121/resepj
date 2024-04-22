@@ -65,8 +65,8 @@ export default {
   auth: {
     redirect: {
       login: '/users/login',
-      logout: '/index',
-      home: '/index',
+      logout: '/',
+      home: '/',
     },
     strategies: {
       'laravelUser': {

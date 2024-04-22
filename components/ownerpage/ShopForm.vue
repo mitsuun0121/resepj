@@ -1,8 +1,8 @@
 <template>
   <v-container>
-    <!-- 店舗編集 -->
+    <!-- 店舗情報を編集 -->
     <v-card-title>
-      <v-icon left>mdi-home-plus</v-icon>店舗
+      <v-icon left>mdi-home-edit</v-icon>店舗
     </v-card-title>
 
     <!-- Snackbar コンポーネントを表示 -->
@@ -19,91 +19,106 @@
       </div>
     </v-snackbar>
 
-    <v-card class="mt-6">
-      <v-row justify="center">
-        <v-col cols="12" sm="8" md="8" lg="8">
-          <v-form @submit.prevent="editShop">
+    <v-card class="mt-2">
+      <v-card-text>
+        <v-row justify="center">
+          <v-col cols="12" sm="8" md="8" lg="8">
+            <v-form @submit.prevent="editShop" ref="editShopForm">
 
-            <v-card-text>店名</v-card-text>
-            <v-text-field
-              v-model="owners.shop.name"
-              class="mt-n2"
-              dense
-              outlined
-              @input="handleFormChange">
-            </v-text-field>
-            <v-divider></v-divider>
+              <v-card-text>店名</v-card-text>
+              <v-text-field
+                v-model="owners.shop.name"
+                class="mt-n2"
+                dense
+                outlined
+                hint="店名を入力して下さい。"
+                persistent-hint
+                :rules="shopNameRules"
+                required>
+              </v-text-field>
+              <v-divider></v-divider>
 
-            <v-card-text class="mt-5">店舗画像</v-card-text>
-            <v-img
-              :aspect-ratio="16 / 10"
-              :src="owners.shop.photo_url">
-            </v-img>
-            <div class="d-flex mb-4">
+              <v-card-text class="mt-5">店舗画像</v-card-text>
               <v-img
-                v-for="(image, index) in images"
-                :key="index" :src="image.src" :aspect-ratio="16 / 10"
-                :style="{ width: '20%', cursor: 'pointer', marginBottom: '10px' }"
-                :class="{ selected: image.src === owners.shop.photo_url }"
-                @click="changeImage(image.src)">
+                :aspect-ratio="16 / 10"
+                :src="owners.shop.photo_url">
               </v-img>
+              <div class="d-flex mb-4">
+                <v-img
+                  v-for="(image, index) in images"
+                  :key="index" :src="image.src" :aspect-ratio="16 / 10"
+                  :style="{ width: '20%', cursor: 'pointer', marginBottom: '10px' }"
+                  :class="{ selected: image.src === owners.shop.photo_url }"
+                  @click="changeImage(image.src)">
+                </v-img>
+              </div>
+              <v-messages
+                  class="mt-n5
+                  mb-2
+                  ml-3"
+                  :value="photoMessage"
+                  color="gray">
+                </v-messages>
+              <v-divider></v-divider>
+
+              <v-card-text class="mt-5">地域</v-card-text>
+              <v-select
+                v-model="owners.shop.area_id"
+                class="mt-n2"
+                outlined
+                dense
+                hint="地域を選択して下さい。"
+                persistent-hint
+                :placeholder="owners.shop.area.name"
+                :items="areas">
+              </v-select>
+              <v-divider></v-divider>
+
+              <v-card-text class="mt-5">ジャンル</v-card-text>
+              <v-select
+                v-model="owners.shop.genre_id"
+                class="mt-n2"
+                outlined
+                dense
+                hint="ジャンルを選択して下さい。"
+                persistent-hint
+                :placeholder="owners.shop.genre.name"
+                :items="genres">
+              </v-select>
+              <v-divider></v-divider>
+
+              <v-card-text class="mt-5">店舗概要</v-card-text>
+              <v-textarea
+                v-model="owners.shop.description"
+                class="mt-n2"
+                height="250"
+                outlined
+                counter
+                hint="店舗概要を入力して下さい。"
+                persistent-hint
+                :rules="shopdescriptionRules"
+                required>
+              </v-textarea>
+            </v-form>
+
+            <!--　店舗内容変更ボタン -->
+            <div class="text-center
+              mt-12
+              pb-8">
+              <v-btn
+                color="primary"
+                min-width="150"
+                height="50"
+                rounded
+                class="text-body-1
+                font-weight-bold"
+                @click="editShop">
+                変更する
+              </v-btn>
             </div>
-            <v-divider></v-divider>
-
-            <v-card-text class="mt-5">地域</v-card-text>
-            <v-select
-              v-model="owners.shop.area_id"
-              class="mt-n2"
-              outlined
-              dense
-              :placeholder="owners.shop.area.name"
-              :items="areas"
-              @input="handleFormChange">
-            </v-select>
-            <v-divider></v-divider>
-
-            <v-card-text class="mt-5">ジャンル</v-card-text>
-            <v-select
-              v-model="owners.shop.genre_id"
-              class="mt-n2"
-              outlined
-              dense
-              :placeholder="owners.shop.genre.name"
-              :items="genres"
-              @input="handleFormChange">
-            </v-select>
-            <v-divider></v-divider>
-
-            <v-card-text class="mt-5">店舗概要</v-card-text>
-            <v-textarea
-              v-model="owners.shop.description"
-              class="mt-n2"
-              height="200"
-              outlined
-              auto-grow
-              counter
-              @input="handleFormChange">
-            </v-textarea>
-          </v-form>
-
-          <!--　店舗内容変更ボタン -->
-          <div class="text-center
-            mt-12
-            pb-8">
-            <v-btn
-              color="primary"
-              min-width="150"
-              height="50"
-              rounded
-              class="text-body-1
-              font-weight-bold"
-              :disabled="!formChanged"
-              @click="editShop">
-              変更する
-            </v-btn>
-          </div>
-        </v-col>
-      </v-row>
+          </v-col>
+        </v-row>
+      </v-card-text>
     </v-card>
   </v-container>
 </template>
@@ -149,7 +164,18 @@ export default {
         { text: 'ラーメン', value: '5' },
       ],
 
-      formChanged: false,
+      // バリデーション実装
+      shopNameRules: [
+        v => !!v || '店名を入力して下さい。',
+        v => (v && v.length <=  50) || '50文字以下で入力してください。',
+      ],
+
+      shopdescriptionRules: [
+        v => !!v || '店舗概要を入力して下さい。',
+        v => (v && v.length <=  400) || '400文字以下で入力してください。',
+      ],
+
+      photoMessage: ['店舗画像を選択してください。'],
 
       // スナックバー
       snackbar: {
@@ -158,7 +184,7 @@ export default {
         color: 'primary', // デフォルトの色
         timeout: 3000,
       },
-    };
+    }
   },
 
   mounted() {
@@ -171,11 +197,6 @@ export default {
       this.snackbar.message = message;
       this.snackbar.color = color || 'primary'; // デフォルトの色
       this.snackbar.show = true;
-    },
-
-    // 変更があった場合に変更するボタンをアクティブ
-    handleFormChange() {
-      this.formChanged = true;
     },
 
     // 店舗代表者のデータを取得
@@ -197,7 +218,7 @@ export default {
         console.log('店舗代表者のジャンル:', ownerData.shop.genre.name);
 
         this.owners = ownerData;
-        
+
       } catch (error) {
         console.error('店舗代表者のデータの取得に失敗しました', error);
       }
@@ -209,8 +230,18 @@ export default {
       this.formChanged = true;
     },
 
+    // フォームのバリデーション
+    editShop() {
+      const valid = this.$refs.editShopForm.validate();
+      if (valid) {
+        this.editShopData();
+      } else {
+        console.log('バリデーションエラーがあります');
+      }
+    },
+
     // 店舗データを編集
-    async editShop() {
+    async editShopData() {
       try {
         const id = this.owners.shop.id;
         const response = await this.$axios.put(`${process.env.API_URL}/api/shop/${id}`, {
@@ -231,7 +262,7 @@ export default {
         console.error('店舗データの更新に失敗しました', error);
       }
     },
-  },
+  }
 }
 </script>
 

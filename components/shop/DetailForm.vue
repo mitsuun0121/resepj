@@ -180,6 +180,7 @@ export default {
         const response = await this.$axios.get(`${process.env.API_URL}/api/shop/${shopId}`);
         this.shop = response.data;
 
+        console.log('お店の詳細データ:', this.shop);
       } catch (error) {
         console.error('ショップの詳細データの取得に失敗しました', error);
       }
@@ -253,26 +254,29 @@ export default {
       }
     },
 
-    // レビューデータを取得
+    // 評価データを取得
     async fetchReviewData() {
       const shopId = this.$route.params.id;
       try {
         const response = await this.$axios.get(`${process.env.API_URL}/api/review/${shopId}`);
 
         console.log(response.data);
-        // レビューデータがない場合は何もしない
-        const totalReview = response.data.length;
-        if (totalReview === 0) {
-        
-          console.log('レビューがありません');
+
+        // 評価データがない場合は何もしない
+        if (!Array.isArray(response.data) || response.data.length === 0) {
+          console.log('評価がありません');
           return;
         }
-        // レビューの平均値を計算
+        // 評価の平均値を計算
+        const totalReview = response.data.length;
+        console.log('評価の数', totalReview);
         const totalRating = response.data.reduce((acc, curr) => acc + curr.review, 0);
+        console.log('評価の合計', totalRating);
         this.rating = totalRating / totalReview;
+        console.log('平均評価', this.rating);
 
       } catch (error) {
-        console.error('レビューデータの取得に失敗しました', error);
+        console.error('評価データの取得に失敗しました', error);
       }
     },
   },

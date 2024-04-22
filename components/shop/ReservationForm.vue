@@ -42,10 +42,70 @@
         v-if="$auth.loggedIn"
         class="red--text
         font-weight-bold
-        mt-5
+        mt-3
+        mb-10
         ml-5"
-        style="font-size: clamp(0.6rem, calc(0.6vw + 0.7rem), 1.2rem);">※カレンダーから予約日を選んで下さい
+        style="font-size: clamp(0.6rem, calc(0.6vw + 0.7rem), 1.2rem);">※カレンダーから予約日を選んで下さい。
       </p>
+
+      <!-- 未ログインユーザーはログインページへ -->
+      <div
+        v-if="!$auth.loggedIn"
+        class="text-center
+        mt-3
+        mb-12">
+        <NuxtLink
+          style="font-size: clamp(1rem, calc(0.8vw + 0.9rem), 1.4rem);"
+          class="login-btn"
+          to="/users/login">
+          ご予約の際はログインが必要です
+        </NuxtLink>
+      </div>
+
+      <!-- 口コミを表示 -->
+      <template>
+        <v-card
+          v-for="review in reviews" :key="review.id"
+          class="pr-5
+          pl-2
+          mb-3"
+          outlined>
+          <v-row align="center" >
+            <v-col cols="6">
+              <v-rating
+                v-model="review.review"
+                class="mt-16
+                ml-3"
+                length="5"
+                :size="ratingSize"
+                color="info"
+                background-color="grey"
+                half-increments
+                readonly>
+              </v-rating>
+            </v-col>
+
+            <v-col cols="6">
+              <v-img
+                v-if="review.image"
+                :src="getImageUrl(review.image)"
+                max-width="200"
+                class="mt-5">
+              </v-img>
+            </v-col>
+          </v-row>
+
+          <v-card-title
+            class="text-body-1">
+            {{ review.title }}
+          </v-card-title>
+
+          <v-card-text>
+            {{ review.comment }}
+          </v-card-text>
+        
+        </v-card>
+      </template>
 
       <!-- 予約ダイアログ -->
       <v-dialog
@@ -207,29 +267,14 @@
           </v-form>
         </v-card>
       </v-dialog>
-
-      <!-- 未ログインユーザーはログインページへ -->
-      <div
-        v-if="!$auth.loggedIn"
-        class="text-center
-        mt-16">
-        <NuxtLink
-          style="font-size: clamp(1rem, calc(0.8vw + 0.9rem), 1.4rem);"
-          class="login-btn"
-          to="/users/login">
-          ご予約の際はログインが必要です
-        </NuxtLink>
-      </div>
               
     </v-card>
   </v-container>
-  
 </template>
 
 <script>
 
 export default {
-  
   name: 'ShopReservationForm',
   data() {
     return {
@@ -242,6 +287,12 @@ export default {
       count: '',
       counts: ['1人', '2人', '3人', '4人', '5人'],
       shop: null,
+      reviews: [],
+      review: 0,
+      image: '',
+      title: null,
+      comment: null,
+      ratingSize: 20, // 初期値を設定
 
       // バリデーション実装
       dateRules: [
@@ -254,6 +305,17 @@ export default {
         v => !!v || '人数を選択して下さい',
       ],
     };
+  },
+
+  // ratingの初期サイズを設定
+  created() {
+    this.setRatingSize();
+    window.addEventListener('resize', this.setRatingSize);
+  },
+
+  // ratingのサイズを変更
+  destroyed() {
+    window.removeEventListener('resize', this.setRatingSize);
   },
 
   watch: {
@@ -274,6 +336,7 @@ export default {
 
   mounted() {
     this.fetchShopDetail();
+    this.fetchReview();
   },
 
   methods: {
@@ -321,7 +384,9 @@ export default {
       const shopId = this.$route.params.id;
       try {
         const response = await this.$axios.get(`${process.env.API_URL}/api/shop/${shopId}`);
+
         this.shop = response.data;
+        this.shop_id = shopId;
 
       } catch (error) {
         console.error('ショップの詳細データの取得に失敗しました', error);
@@ -352,7 +417,7 @@ export default {
             date: this.selectedDate,
             time: this.time,
             count: convertCount,
-            shop_id: shopId,
+            shop_id: this.shop_id,
           });
 
           this.$router.push("/users/done");
@@ -362,6 +427,36 @@ export default {
       } catch (error) {
         console.error('予約に失敗しました', error);
       }
+    },
+
+    // ブラウザの幅に応じてratingのサイズを変更
+    setRatingSize() {
+      const screenWidth = window.innerWidth;
+      if (screenWidth < 600) {
+        this.ratingSize = 20;
+      } else {
+        this.ratingSize = 28;
+      }
+    },
+
+    // 口コミを取得
+    async fetchReview() {
+      const shopId = this.$route.params.id;
+      try {
+        const response = await this.$axios.get(`${process.env.API_URL}/api/review/${shopId}`);
+
+        if (response && response.data && Array.isArray(response.data)) {
+          this.reviews = response.data;
+          console.log(`口コミデータ:`, this.reviews);
+        }
+      } catch (error) {
+        console.error('投稿履歴の取得に失敗しました', error)
+      }
+    },
+
+    // 画像のURLを生成
+    getImageUrl(imagePath) {
+      return `http://localhost/${imagePath}`;
     },
   },
 }
