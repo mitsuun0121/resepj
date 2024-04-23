@@ -236,12 +236,16 @@
       </v-data-table>
 
       <!-- 編集ダイアログ -->
-      <v-dialog v-model="editDialog" width="500">
+      <v-dialog v-model="editDialog" width="600">
         <v-card class="pb-4">
           <v-card-title class="text-h6">口コミを編集</v-card-title>
           <v-card-text>
 
-            <v-card-text class="mb-n5">評価</v-card-text>
+            <v-card-text
+              class="mb-n5">
+              評価
+              <span class="red--text">（必須）</span>
+            </v-card-text>
             <v-rating
               v-model="editedReview.review"
               color="info"
@@ -254,7 +258,11 @@
               color="gray"
             ></v-messages>
 
-            <v-card-text class="mb-n2">タイトル</v-card-text>
+            <v-card-text
+              class="mb-n2">
+              タイトル
+              <span class="red--text">（必須）</span>
+            </v-card-text>
             <v-text-field 
               v-model="editedReview.title"
               outlined
@@ -266,7 +274,11 @@
               persistent-hint>
             </v-text-field>
 
-            <v-card-text class="mb-n2">本文</v-card-text>    
+            <v-card-text
+              class="mb-n2">
+              本文
+              <span class="red--text">（必須）</span>
+            </v-card-text>    
             <v-textarea
               v-model="editedReview.comment"
               outlined
@@ -370,7 +382,7 @@ export default {
       // 投稿履歴テーブルのヘッダー
       reviewHeaders: [
         { text: '店名', value: 'shopName', sortable: false },
-        { text: '投稿日', value: 'created_at', sortable: false },
+        { text: '投稿日', value: 'updated_at', sortable: false },
         { text: '編集', value: 'edit', sortable: false, align: 'center' },
         { text: '削除', value: 'delete', sortable: false, align: 'center' },
       ],
@@ -403,6 +415,7 @@ export default {
       this.editedReview.review = review.review;
       this.editedReview.title = review.title;
       this.editedReview.comment = review.comment;
+      this.editedReview.image = review.image;
       this.editDialog = true;
     },
 
@@ -520,7 +533,7 @@ export default {
           
           // 店名・投稿日をフォーマット
           userReviews.forEach(userReview => {
-            userReview.created_at = this.formatDate(userReview.created_at);
+            userReview.updated_at = this.formatDate(userReview.updated_at);
             userReview.shopName = userReview.shop.name;
           });
 
