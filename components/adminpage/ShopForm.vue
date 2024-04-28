@@ -66,7 +66,9 @@
                 hint="地域を選択して下さい。"
                 persistent-hint
                 :placeholder="area"
-                :items="areas">
+                :items="areas"
+                :rules="shopAreaRules"
+                required>
               </v-select>
               <v-divider></v-divider>
 
@@ -79,7 +81,9 @@
                 hint="ジャンルを選択して下さい。"
                 persistent-hint
                 :placeholder="genre"
-                :items="genres">
+                :items="genres"
+                :rules="shopGenreRules"
+                required>
               </v-select>
               <v-divider></v-divider>
 
@@ -92,7 +96,7 @@
                 counter
                 hint="店舗概要を入力して下さい。"
                 persistent-hint
-                :rules="shopdescriptionRules"
+                :rules="shopDescriptionRules"
                 required>
               </v-textarea>
             </v-form>
@@ -149,7 +153,15 @@ export default {
         v => (v && v.length <=  50) || '50文字以下で入力してください。',
       ],
 
-      shopdescriptionRules: [
+      shopAreaRules: [
+        v => !!v || '地域を選択して下さい。',
+      ],
+
+      shopGenreRules: [
+        v => !!v || 'ジャンルを選択して下さい。',
+      ],
+
+      shopDescriptionRules: [
         v => !!v || '店舗概要を入力して下さい。',
         v => (v && v.length <=  400) || '400文字以下で入力してください。',
       ],
