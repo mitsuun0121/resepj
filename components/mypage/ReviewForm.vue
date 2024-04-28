@@ -32,118 +32,121 @@
     <div v-if="tab === 1">
       <v-card>
         <v-card-text>
-        <v-row justify="center">
-          <v-col cols="12" sm="8" md="8" lg="8">
-            <div align="center">
-              <v-alert
-                class="mt-3"
-                width="250"
-                color="primary"
-                dense
-                text>
-                <div class="mt-1">
-                  口コミ投稿フォーム
-                </div>
-              </v-alert>
-            </div>
+          <v-row justify="center">
+            <v-col cols="12" sm="8" md="8" lg="8">
+              <div align="center">
+                <v-alert
+                  class="mt-3"
+                  width="250"
+                  color="primary"
+                  dense
+                  text>
+                  <div class="mt-1">
+                    口コミ投稿フォーム
+                  </div>
+                </v-alert>
+              </div>
 
-            <v-form
-              ref="reviewserver"
-              enctype="multipart/form-data">
-              <v-card-text>
-                店名
-                <span class="red--text">（必須）</span>
-              </v-card-text>
-              <v-select
-                v-model="shopName"
-                class="mt-n2"
-                :items="filteredShopNames"
-                dense
-                outlined
-                hint="店名を選択して下さい。"
-                persistent-hint
-                :rules="shopNameRules"
-                required
-              ></v-select>
-              <v-divider></v-divider>
+              <v-form
+                ref="reviewserver"
+                enctype="multipart/form-data">
+                <v-card-text>
+                  店名
+                  <span class="red--text">（必須）</span>
+                </v-card-text>
+                <v-select
+                  v-model="shopName"
+                  class="mt-n2"
+                  :items="filteredShopNames"
+                  dense
+                  outlined
+                  hint="店名を選択して下さい。"
+                  persistent-hint
+                  :rules="shopNameRules"
+                  required
+                ></v-select>
+                <v-divider></v-divider>
 
-              <v-card-text
-                class="mt-5">
-                評価
-                <span class="red--text">（必須）</span>
-              </v-card-text>
-              <v-rating
-                v-model="rating"
-                class="mt-n4"
-                ref="rating"
-                :items="5"
-                :size="35"
-                color="info"
-                background-color="grey lighten-2"
-              ></v-rating>
-              <v-messages
-                v-if="rating > 0"
-                class="mb-2
-                ml-3"
-                :value="ratingMessage"
-                color="gray"
-              ></v-messages>
-              <v-messages
-                v-else
-                class="mb-2
-                ml-3"
-                :value="ratingMessage"
-                color="error"
-              ></v-messages>
-              <v-divider></v-divider>
+                <v-card-text
+                  class="mt-5">
+                  評価
+                  <span class="red--text">（必須）</span>
+                </v-card-text>
+                <v-rating
+                  v-model="rating"
+                  class="mt-n4"
+                  ref="rating"
+                  :items="5"
+                  :size="35"
+                  color="info"
+                  background-color="grey lighten-2"
+                ></v-rating>
+                <v-messages
+                  v-if="rating > 0"
+                  class="mb-2
+                  ml-3"
+                  :value="ratingMessage"
+                  color="gray"
+                ></v-messages>
+                <v-messages
+                  v-else
+                  class="mb-2
+                  ml-3"
+                  :value="ratingMessage"
+                  color="error"
+                ></v-messages>
+                <v-divider></v-divider>
 
-              <v-card-text
-                class="mt-5">
-                タイトル
-                <span class="red--text">（必須）</span>
-              </v-card-text>
-              <v-text-field
-                v-model="title"
-                class="mt-n2"
-                outlined
-                dense
-                counter
-                hint="2～25文字の範囲で入力して下さい。"
-                persistent-hint
-                :rules="titleRules"
-                required
-              ></v-text-field>
-              <v-divider></v-divider>
+                <v-card-text
+                  class="mt-5">
+                  タイトル
+                  <span class="red--text">（必須）</span>
+                </v-card-text>
+                <v-text-field
+                  v-model="title"
+                  class="mt-n2"
+                  outlined
+                  dense
+                  counter
+                  hint="2～25文字の範囲で入力して下さい。"
+                  persistent-hint
+                  :rules="titleRules"
+                  required>
+                </v-text-field>
+                <v-divider></v-divider>
 
-              <v-card-text
-                class="mt-5">
-                本文
-                <span class="red--text">（必須）</span>
-              </v-card-text>
-              <v-textarea
-                v-model="comment"
-                class="mt-n2"
-                outlined
-                auto-grow
-                counter
-                hint="25～400文字の範囲で入力して下さい。"
-                persistent-hint
-                :rules="commentRules"
-                required
-              ></v-textarea>
-              <v-divider></v-divider>
-            
-              <!-- 画像アップロード -->
-              <v-card-text class="mt-5">画像を追加</v-card-text>
-              <template>
+                <v-card-text
+                  class="mt-5">
+                  本文
+                  <span class="red--text">（必須）</span>
+                </v-card-text>
+                <v-textarea
+                  v-model="comment"
+                  class="mt-n2"
+                  outlined
+                  auto-grow
+                  counter
+                  hint="25～400文字の範囲で入力して下さい。"
+                  persistent-hint
+                  :rules="commentRules"
+                  required>
+                </v-textarea>
+                <v-divider></v-divider>
+              
+                <!-- 画像アップロード -->
+                <v-card-text class="mt-5">画像を追加</v-card-text>
                 <div>
                   <!-- ファイル選択 -->
-                  <input
+                  <v-file-input
                     type="file"
-                    ref="imageInput"
+                    accept="image/png, image/jpeg"
+                    label="画像を選択"
+                    placeholder="画像を選択して下さい"
+                    prepend-icon="mdi-camera"
                     @change="handleImageUpload"
-                    accept="image/png,image/jpeg">
-                
+                    @dragover.prevent>
+                  </v-file-input>
+                  
                   <!-- アップロードされた画像のプレビュー -->
                   <img
                     v-if="imageUrl"
@@ -155,30 +158,30 @@
 
                   <!-- 非対応拡張子のエラーメッセージ -->
                   <p
-                  v-if="fileError"
-                  :style="{ color: fileErrorColor }">
-                  {{ fileError }}</p>
+                    v-if="fileError"
+                    :style="{ color: fileErrorColor }">
+                    {{ fileError }}
+                  </p>
                 </div>
-              </template>
-
-              <!--　口コミ投稿ボタン -->
-              <div
-                class="text-center
-                mt-12
-                pb-8">
-                <v-btn
-                  color="primary"
-                  min-width="150"
-                  height="50"
-                  rounded
-                  class="text-body-1"
-                  @click="addReview">
-                  口コミを投稿
-                </v-btn>
-              </div>
-            </v-form>
-          </v-col>
-        </v-row>
+                
+                <!--　口コミ投稿ボタン -->
+                <div
+                  class="text-center
+                  mt-12
+                  pb-8">
+                  <v-btn
+                    color="primary"
+                    min-width="150"
+                    height="50"
+                    rounded
+                    class="text-body-1"
+                    @click="addReview">
+                    口コミを投稿
+                  </v-btn>
+                </div>
+              </v-form>
+            </v-col>
+          </v-row>
         </v-card-text>
       </v-card>
     </div>
@@ -442,20 +445,21 @@ export default {
     },
 
     // ファイルから選択して画像をアップロード
-    handleImageUpload(event) {
-      const file = event.target.files[0];
-      if (!file) return;
-
+    handleImageUpload(file) {
+      if (!file) {
+        return;
+      }
       // 画像URLから拡張子を取得
       const extension = file.name.split('.').pop().toLowerCase();
 
       // jpeg, png以外の拡張子の場合はエラーメッセージ
       if (extension !== 'jpg' && extension !== 'jpeg' && extension !== 'png') {
-        this.fileError = '写真はJPEGまたはPNG形式を選択してください。';
+        this.fileError = '写真はJPEGまたはPNG形式を選択して下さい。';
         this.fileErrorColor = 'red';
         return;
       }
       this.fileError = '';
+      this.file = file;
       this.imageUrl = URL.createObjectURL(file);
     },
 
@@ -496,8 +500,8 @@ export default {
           formData.append('comment', this.comment);
 
           // ファイルを追加
-          const file = this.$refs.imageInput.files[0];
-          formData.append('image', file);
+          
+          formData.append('image', this.file);
 
           // フォームデータを送信
           const response = await this.$axios.post(`${process.env.API_URL}/api/review`, formData);
