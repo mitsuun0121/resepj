@@ -30,6 +30,7 @@
               </v-btn>
             </template>
             <v-list class="py-1 text-caption">
+              <v-list-item @click="fetchShopData()">すべて</v-list-item>
               <v-list-item @click="searchByArea('東京都')">東京都</v-list-item>
               <v-list-item @click="searchByArea('大阪府')">大阪府</v-list-item>
               <v-list-item @click="searchByArea('福岡県')">福岡県</v-list-item>
@@ -48,6 +49,7 @@
               </v-btn>
             </template>
             <v-list class="py-1 text-caption">
+              <v-list-item @click="fetchShopData()">すべて</v-list-item>
               <v-list-item @click="searchByGenre('寿司')">寿司</v-list-item>
               <v-list-item @click="searchByGenre('焼肉')">焼肉</v-list-item>
               <v-list-item @click="searchByGenre('居酒屋')">居酒屋</v-list-item>
@@ -235,7 +237,7 @@
 </template>
 
 <script>
-import _ from 'underscore';
+import _ from 'underscore'; // Underscore.js をインポート
 export default {
   name: 'IndexPage',
   data() {
@@ -326,7 +328,7 @@ export default {
         this.searchResult = '「' + area + '」' + ' の検索結果一覧';
         this.shops = response.data;
 
-        // レビューデータを取得
+        // 評価データを取得
         await this.fetchReviewData();
 
       } catch (error) {
@@ -364,6 +366,8 @@ export default {
         this.searchResult = '';
         // ショップ件数を表示
         this.shopsCounted = true;
+
+        await this.fetchReviewData();
 
       } catch (error) {
         console.error('ショップデータの取得に失敗しました', error);
