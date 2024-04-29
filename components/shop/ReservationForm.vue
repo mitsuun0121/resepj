@@ -27,16 +27,16 @@
       </v-sheet>
         
       <!-- カレンダーを表示 -->
-        <v-date-picker
-          v-model="selectedDate"
-          :show-adjacent-months="true"
-          color="primary"
-          :day-format="date => new Date(date).getDate()"
-          :min="minDate"
-          no-title
-          full-width
-          @click:date="openDialog">          
-        </v-date-picker>
+      <v-date-picker
+        v-model="selectedDate"
+        :show-adjacent-months="true"
+        color="primary"
+        :day-format="date => new Date(date).getDate()"
+        :min="minDate"
+        no-title
+        full-width
+        @click:date="openDialog">          
+      </v-date-picker>
 
       <p
         v-if="$auth.loggedIn"
@@ -62,18 +62,38 @@
         </NuxtLink>
       </div>
 
+      <div
+        v-if="reviews.length > 0"
+        class="text-left
+        mt-3
+        mb-1">
+        <NuxtLink
+          class="review-btn"
+          :to="'/users/' + shop_id"
+          style="font-size: clamp(0.8rem, calc(0.7vw + 0.8rem), 1rem);">
+          全ての口コミを見る
+        </NuxtLink>
+      </div>
+
       <!-- 口コミを表示 -->
       <template>
         <v-card
-          v-for="review in reviews" :key="review.id"
+          v-if="reviews.length > 0"
           class="pr-5
           pl-2
           mb-3"
           outlined>
-          <v-row align="center" >
+
+          <!-- 投稿日 -->
+          <v-card-text class="mb-n10">
+            {{ formatDate(reviews[0].updated_at) }}
+          </v-card-text>
+
+          <!-- 評価 -->
+          <v-row align="center">
             <v-col cols="6">
               <v-rating
-                v-model="review.review"
+                v-model="reviews[0].review"
                 class="mt-16
                 ml-3"
                 length="5"
@@ -85,23 +105,26 @@
               </v-rating>
             </v-col>
 
+            <!-- 画像 -->
             <v-col cols="6">
               <v-img
-                v-if="review.image"
-                :src="getImageUrl(review.image)"
+                v-if="reviews[0].image"
+                :src="getImageUrl(reviews[0].image)"
                 max-width="200"
                 class="mt-5">
               </v-img>
             </v-col>
           </v-row>
 
+          <!-- タイトル -->
           <v-card-title
             class="text-body-1">
-            {{ review.title }}
+            {{ reviews[0].title }}
           </v-card-title>
 
+          <!-- コメント -->
           <v-card-text>
-            {{ review.comment }}
+            {{ reviews[0].comment }}
           </v-card-text>
         
         </v-card>
@@ -287,6 +310,7 @@ export default {
       count: '',
       counts: ['1人', '2人', '3人', '4人', '5人'],
       shop: null,
+      shop_id: null,
       reviews: [],
       review: 0,
       image: '',
@@ -313,7 +337,7 @@ export default {
     window.addEventListener('resize', this.setRatingSize);
   },
 
-  // ratingのサイズを変更
+  // ブラウザの幅に応じてratingのサイズを変更
   destroyed() {
     window.removeEventListener('resize', this.setRatingSize);
   },
@@ -446,7 +470,17 @@ export default {
         const response = await this.$axios.get(`${process.env.API_URL}/api/review/${shopId}`);
 
         if (response && response.data && Array.isArray(response.data)) {
+
+          // 口コミデータを取得
           this.reviews = response.data;
+
+          // 投稿日が一番新しい口コミを表示
+          this.reviews.sort((a, b) => {
+            const dateA = new Date(a.updated_at);
+            const dateB = new Date(b.updated_at);
+            return dateB - dateA;
+          });
+
           console.log(`口コミデータ:`, this.reviews);
         }
       } catch (error) {
@@ -454,6 +488,13 @@ export default {
       }
     },
 
+    // 口コミ投稿日の日付のフォーマット
+    formatDate(dateString) {
+      const options = { year: 'numeric', month: 'short', day: 'numeric' };
+      const date = new Date(dateString);
+      return date.toLocaleDateString('ja-JP', options);
+    },
+    
     // 画像のURLを生成
     getImageUrl(imagePath) {
       return `http://localhost/${imagePath}`;
@@ -475,5 +516,15 @@ export default {
 
 .login-btn:hover {
   opacity: 0.6;
+}
+
+.review-btn {
+  color: #616161;
+  margin-left: 5px;
+  transition: 0.7s;
+}
+
+.review-btn:hover {
+  opacity: 0.8;
 }
 </style>
