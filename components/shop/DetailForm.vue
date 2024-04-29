@@ -6,15 +6,15 @@
       right
       color="grey lighten-1">
       <template v-slot:activator="{ on, attrs }">
-          <NuxtLink to="/">
-        <v-icon
-          color="primary"
-          large
-          class="ml-2"
-          v-bind="attrs"
-          v-on="on"
-          >mdi-chevron-left
-        </v-icon>
+        <NuxtLink to="/">
+          <v-icon
+            color="primary"
+            large
+            class="ml-2"
+            v-bind="attrs"
+            v-on="on"
+            >mdi-chevron-left
+          </v-icon>
         </NuxtLink>
       </template>
       <span>戻る</span>
@@ -65,7 +65,7 @@
             mb-8
             mr-5">
             {{ totalReview }}件
-            ({{ rating }})
+            ({{ rating.toFixed(1) }})
           </span>
         </v-row>
 
@@ -148,7 +148,6 @@
 </template>
 
 <script>
-
 export default {
   name: 'ShopDetailForm',
   data() {
@@ -300,3 +299,11 @@ export default {
   },
 }
 </script>
+
+<style scoped>
+
+.fixed {
+  position: fixed;
+  
+}
+</style>
