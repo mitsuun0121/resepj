@@ -21,15 +21,19 @@
 
 ## 【ユーザーの機能】							
 ### 会員登録							
-- 新規会員登録ページで新規ユーザー登録							
-- 会員登録時のメールアドレス宛に確認メールが送信されるメール認証機能							
+- 新規会員登録ページで新規ユーザー登録<br><br>
+![Demo1](https://raw.githubusercontent.com/mitsuun0121/resepj.gif/main/resepj_register.gif)<br><br> 				
+- 会員登録時のメールアドレス宛に確認メールが送信されるメール認証機能<br><br>
+![Demo2](https://raw.githubusercontent.com/mitsuun0121/resepj.gif/main/resepj_email_verification.gif)<br><br>  				
 ###### ※後述の「注意事項」もご確認下さい							
 ### ログイン							
 - ログインページでログイン後、ログインユーザーのトップページに遷移							
 ### ログアウト							
-- ログアウト後、デフォルトのトップページに遷移							
+- ログアウト後、デフォルトのトップページに遷移<br><br>
+![Demo4](https://raw.githubusercontent.com/mitsuun0121/resepj.gif/main/resepj_login_logout.gif)<br><br>    				
 ### 飲食店の予約							
-- 飲食店詳細ページで日付、時間、人数を決定して予約完了後、予約完了ページに遷移							
+- 飲食店詳細ページで日付、時間、人数を決定して予約完了後、予約完了ページに遷移<br><br>
+![Demo4](https://raw.githubusercontent.com/mitsuun0121/resepj.gif/main/resepj_reservation.gif)<br><br>   				
 ### Stripe決済							
 - 予約完了ページでStripe決済を選択すると、決済画面に遷移							
 ### 飲食店の予約内容の変更と取消（削除）							
