@@ -30,33 +30,33 @@
 - ログインページでログイン後、ログインユーザーのトップページに遷移							
 ### ログアウト							
 - ログアウト後、デフォルトのトップページに遷移<br><br>
-![Demo4](https://raw.githubusercontent.com/mitsuun0121/README.gif/main/resepj_login_logout.gif)<br><br>    				
+![Demo3](https://raw.githubusercontent.com/mitsuun0121/README.gif/main/resepj_login_logout.gif)<br><br>    				
 ### 飲食店の予約							
 - 飲食店詳細ページで日付、時間、人数を決定して予約完了後、予約完了ページに遷移<br><br>
 ![Demo4](https://raw.githubusercontent.com/mitsuun0121/README.gif/main/resepj_reservation.gif)<br><br>   				
 ### Stripe決済							
 - 予約完了ページでStripe決済を選択すると、決済画面に遷移<br><br>
-![Demo4](https://raw.githubusercontent.com/mitsuun0121/README.gif/main/resepj_stripe.gif)<br><br>
+![Demo5](https://raw.githubusercontent.com/mitsuun0121/README.gif/main/resepj_stripe.gif)<br><br>
 ### 飲食店の予約内容の変更と取消（削除）							
 - マイページの予約状況から予約内容の日付、時間、人数の変更、または予約の取消（削除）ができる<br><br>
-![Demo4](https://raw.githubusercontent.com/mitsuun0121/README.gif/main/resepj_reservation_change_cancel.gif)<br><br>  				
+![Demo6](https://raw.githubusercontent.com/mitsuun0121/README.gif/main/resepj_reservation_change_cancel.gif)<br><br>  				
 ### 飲食店の予約の削除							
 - マイページの予約履歴から過去の予約履歴を削除できる<br><br>
-![Demo4](https://raw.githubusercontent.com/mitsuun0121/README.gif/main/resepj_already_visited_delete.gif)<br><br>
+![Demo7](https://raw.githubusercontent.com/mitsuun0121/README.gif/main/resepj_already_visited_delete.gif)<br><br>
 ### 飲食店のお気に入り登録							
 - トップページの飲食店のハートをクリック、または飲食店詳細ページのハートをクリックすることで、お気に入りが登録できる<br><br>
-![Demo4](https://raw.githubusercontent.com/mitsuun0121/README.gif/main/resepj_favorite.gif)<br><br>
+![Demo8](https://raw.githubusercontent.com/mitsuun0121/README.gif/main/resepj_favorite.gif)<br><br>
 ###### ※後述の「注意事項」もご確認下さい							
 ### 飲食店のお気に入り削除							
 - マイページでお気に入りを削除できる<br><br>
-![Demo4](https://raw.githubusercontent.com/mitsuun0121/README.gif/main/resepj_favorite_delete.gif)<br><br>
+![Demo9](https://raw.githubusercontent.com/mitsuun0121/README.gif/main/resepj_favorite_delete.gif)<br><br>
 ### 飲食店の口コミ投稿							
 - 予約したお店に来店後、マイページの口コミ投稿から口コミを投稿できる
 ### 飲食店の口コミ編集							
 - マイページの投稿履歴から投稿した口コミを編集できる   				
 ### 飲食店の口コミ削除							
 - マイページの投稿履歴から口コミを削除できる<br><br>
-![Demo4](https://raw.githubusercontent.com/mitsuun0121/README.gif/main/resepj_review.gif)<br><br>
+![Demo10](https://raw.githubusercontent.com/mitsuun0121/README.gif/main/resepj_review.gif)<br><br>
 ### 飲食店の検索							
 - トップページのエリアから該当するエリアのお店を検索できる							
 - トップページのジャンルから該当するジャンルのお店を検索できる							
